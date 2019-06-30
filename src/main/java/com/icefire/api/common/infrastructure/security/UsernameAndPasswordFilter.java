@@ -1,10 +1,11 @@
 package com.icefire.api.common.infrastructure.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.icefire.api.common.domain.AuthResult;
+import com.icefire.api.common.application.dto.AuthResult;
 import com.icefire.api.user.domain.model.User;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -24,13 +25,15 @@ import java.util.stream.Collectors;
 
 public class UsernameAndPasswordFilter extends UsernamePasswordAuthenticationFilter {
 
+	@Autowired
 	private JwtConfig jwtConfig;
 
+	@Autowired
 	private AuthenticationManager manager;
 
 
 
-	public UsernameAndPasswordFilter(JwtConfig jwtConfig, AuthenticationManager manager) {
+	UsernameAndPasswordFilter(JwtConfig jwtConfig, AuthenticationManager manager) {
 		this.jwtConfig = jwtConfig;
 		this.manager = manager;
 	}
@@ -54,23 +57,16 @@ public class UsernameAndPasswordFilter extends UsernamePasswordAuthenticationFil
 
 	@Override
 	protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
-		Long now = System.currentTimeMillis();
-		String token = Jwts.builder()
-				.setSubject(authResult.getName())
-				.claim("authorities", authResult.getAuthorities().stream()
-						.map(GrantedAuthority::getAuthority).collect(Collectors.toList()))
-				.setIssuedAt(new Date(now))
-				.setExpiration(new Date(now + jwtConfig.getExpiration() * 1000))  // in milliseconds
-				.signWith(SignatureAlgorithm.HS512, jwtConfig.getSecret().getBytes())
-				.compact();
+		String token = jwtConfig.generateToken(authResult.getName());
 
 		response.addHeader(jwtConfig.getHeader(), jwtConfig.getPrefix() + token);
+		response.addHeader(jwtConfig.getExpires(), String.valueOf(jwtConfig.getExpiration()));
 		response.setContentType("application/json");
 		response.setCharacterEncoding("UTF-8");
 		PrintWriter writer = response.getWriter();
 		AuthResult result = new AuthResult();
 		result.setError(false);
-		result.setMessage("Login successful");
+		result.setMessage("Login successful!");
 		writer.print(new ObjectMapper().writeValueAsString(result));
 		writer.flush();
 	}
@@ -79,6 +75,7 @@ public class UsernameAndPasswordFilter extends UsernamePasswordAuthenticationFil
 	protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
 		response.setContentType("application/json");
 		response.setCharacterEncoding("UTF-8");
+		response.setStatus(400);
 		PrintWriter writer = response.getWriter();
 		AuthResult result = new AuthResult();
 		result.setError(true);

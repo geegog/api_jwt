@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -16,11 +17,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class TokenAuthFilter extends OncePerRequestFilter {
 
-
+	@Autowired
 	private JwtConfig jwtConfig;
 
 	private static Logger logger = LoggerFactory.getLogger(TokenAuthFilter.class);
@@ -32,7 +34,7 @@ public class TokenAuthFilter extends OncePerRequestFilter {
 	@Override
 	protected void doFilterInternal(@NonNull HttpServletRequest request,@NonNull HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 		String header = request.getHeader(jwtConfig.getHeader());
-		logger.info("Called doFilterInternal {}",request);
+		logger.info("Called doFilterInternal {}" + header);
 		if (null != header && header.startsWith(jwtConfig.getPrefix())) {
 			String token = header.replace(jwtConfig.getPrefix(),"");
 			try{
@@ -41,14 +43,17 @@ public class TokenAuthFilter extends OncePerRequestFilter {
 						.parseClaimsJws(token)
 						.getBody();
 				String username = claims.getSubject();
-				if (username!=null){
-					List<String> authorities = (List<String>) claims.get("authorities");
+				if (username != null){
+					Optional<List<String>> authorities = Optional.ofNullable((List<String>) claims.get("authorities"));
+					List<SimpleGrantedAuthority> simpleGrantedAuthorities = null;
+					authorities.ifPresent(strings -> strings.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList()));
 					UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
-							username, null, authorities.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList()));
+							username, null, simpleGrantedAuthorities);
 					SecurityContextHolder.getContext().setAuthentication(auth);
 				}
 			}catch (Exception e){
-				e.printStackTrace();
+				logger.error(e.getMessage());
+				//e.printStackTrace();
 				SecurityContextHolder.clearContext();
 			}
 		}

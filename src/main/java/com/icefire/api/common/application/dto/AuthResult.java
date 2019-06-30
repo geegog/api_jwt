@@ -1,4 +1,4 @@
-package com.icefire.api.common.domain;
+package com.icefire.api.common.application.dto;
 
 import lombok.Data;
 

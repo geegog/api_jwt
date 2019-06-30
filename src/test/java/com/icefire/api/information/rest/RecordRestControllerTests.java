@@ -40,8 +40,6 @@ public class RecordRestControllerTests {
     @Autowired @Qualifier("_halObjectMapper")
     ObjectMapper mapper;
 
-
-
     @Before
     public void setup() {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(this.wac).apply(springSecurity()).build();
@@ -69,6 +67,13 @@ public class RecordRestControllerTests {
         Assert.assertEquals(201, result.getResponse().getStatus());
         Assert.assertNotNull(userDTO.getUsername());
 
+        MvcResult authResult = mockMvc.perform(
+                post("http://localhost:8080/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(userDetails))
+                .andExpect(status().isOk())
+                .andReturn();
+
         String data = "{\n" +
                 "\"value\" : \"testing 33\"\n" +
                 "}";
@@ -79,14 +84,14 @@ public class RecordRestControllerTests {
         MvcResult allUserDataResult = mockMvc.perform(
                 get(allUserDataUrl)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header(HttpHeaders.AUTHORIZATION, "Basic b251Y2hlOm9udWNoZQ=="))
+                        .header(HttpHeaders.AUTHORIZATION, authResult.getResponse().getHeader("Authorization")))
                 .andExpect(status().isOk())
                 .andReturn();
 
         MvcResult encryptionResult = mockMvc.perform(
                 post(encryptionUrl)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header(HttpHeaders.AUTHORIZATION, "Basic b251Y2hlOm9udWNoZQ==")
+                        .header(HttpHeaders.AUTHORIZATION, authResult.getResponse().getHeader("Authorization"))
                         .content(data))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -100,7 +105,7 @@ public class RecordRestControllerTests {
         MvcResult dataResult = mockMvc.perform(
                 get(encryptedDataUrl)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header(HttpHeaders.AUTHORIZATION, "Basic b251Y2hlOm9udWNoZQ=="))
+                        .header(HttpHeaders.AUTHORIZATION, authResult.getResponse().getHeader("Authorization")))
                 .andExpect(status().isOk())
                 .andReturn();
 
@@ -135,6 +140,13 @@ public class RecordRestControllerTests {
         Assert.assertEquals(201, result.getResponse().getStatus());
         Assert.assertNotNull(userDTO.getUsername());
 
+        MvcResult authResult = mockMvc.perform(
+                post("http://localhost:8080/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(userDetails))
+                .andExpect(status().isOk())
+                .andReturn();
+
         String dataToEncrypt = "{\n" +
                 "\"value\" : \"testing 33\"\n" +
                 "}";
@@ -144,7 +156,7 @@ public class RecordRestControllerTests {
         MvcResult encryptionResult = mockMvc.perform(
                 post(encryptionUrl)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header(HttpHeaders.AUTHORIZATION, "Basic b251Y2hlOm9udWNoZQ==")
+                        .header(HttpHeaders.AUTHORIZATION, authResult.getResponse().getHeader("Authorization"))
                         .content(dataToEncrypt))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -167,7 +179,7 @@ public class RecordRestControllerTests {
         MvcResult decryptionResult = mockMvc.perform(
                 post(decryptionUrl)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header(HttpHeaders.AUTHORIZATION, "Basic b251Y2hlOm9udWNoZQ==")
+                        .header(HttpHeaders.AUTHORIZATION, authResult.getResponse().getHeader("Authorization"))
                         .content(dataToDecrypt))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -206,6 +218,13 @@ public class RecordRestControllerTests {
         Assert.assertEquals(201, result.getResponse().getStatus());
         Assert.assertNotNull(userDTO.getUsername());
 
+        MvcResult authResult = mockMvc.perform(
+                post("http://localhost:8080/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(userDetails))
+                .andExpect(status().isOk())
+                .andReturn();
+
         String dataToEncrypt = "{\n" +
                 "\"value\" : \"testing 33\"\n" +
                 "}";
@@ -215,7 +234,7 @@ public class RecordRestControllerTests {
         MvcResult encryptionResult = mockMvc.perform(
                 post(encryptionUrl)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header(HttpHeaders.AUTHORIZATION, "Basic b251Y2hlOm9udWNoZQ==")
+                        .header(HttpHeaders.AUTHORIZATION, authResult.getResponse().getHeader("Authorization"))
                         .content(dataToEncrypt))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -238,7 +257,7 @@ public class RecordRestControllerTests {
         MvcResult encryptionUpdateResult = mockMvc.perform(
                 post(encryptionUpdateUrl)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header(HttpHeaders.AUTHORIZATION, "Basic b251Y2hlOm9udWNoZQ==")
+                        .header(HttpHeaders.AUTHORIZATION, authResult.getResponse().getHeader("Authorization"))
                         .content(dataToReEncrypt))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -277,6 +296,13 @@ public class RecordRestControllerTests {
         Assert.assertEquals(201, result.getResponse().getStatus());
         Assert.assertNotNull(userDTO.getUsername());
 
+        MvcResult authResult = mockMvc.perform(
+                post("http://localhost:8080/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(userDetails))
+                .andExpect(status().isOk())
+                .andReturn();
+
         String dataToEncrypt = "{\n" +
                 "\"value\" : \"\"\n" +
                 "}";
@@ -286,7 +312,7 @@ public class RecordRestControllerTests {
         MvcResult encryptionResult = mockMvc.perform(
                 post(encryptionUrl)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header(HttpHeaders.AUTHORIZATION, "Basic b251Y2hlOm9udWNoZQ==")
+                        .header(HttpHeaders.AUTHORIZATION, authResult.getResponse().getHeader("Authorization"))
                         .content(dataToEncrypt))
                 .andExpect(status().isBadRequest())
                 .andReturn();
@@ -318,6 +344,13 @@ public class RecordRestControllerTests {
         Assert.assertEquals(201, result.getResponse().getStatus());
         Assert.assertNotNull(userDTO.getUsername());
 
+        MvcResult authResult = mockMvc.perform(
+                post("http://localhost:8080/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(userDetails))
+                .andExpect(status().isOk())
+                .andReturn();
+
         String dataToEncrypt = "{\n" +
                 "\"value\" : \"testing 33\"\n" +
                 "}";
@@ -327,7 +360,7 @@ public class RecordRestControllerTests {
         MvcResult encryptionResult = mockMvc.perform(
                 post(encryptionUrl)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header(HttpHeaders.AUTHORIZATION, "Basic b251Y2hlOm9udWNoZQ==")
+                        .header(HttpHeaders.AUTHORIZATION, authResult.getResponse().getHeader("Authorization"))
                         .content(dataToEncrypt))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -350,7 +383,7 @@ public class RecordRestControllerTests {
         MvcResult decryptionUpdateResult = mockMvc.perform(
                 post(decryptionUpdateUrl)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header(HttpHeaders.AUTHORIZATION, "Basic b251Y2hlOm9udWNoZQ==")
+                        .header(HttpHeaders.AUTHORIZATION, authResult.getResponse().getHeader("Authorization"))
                         .content(dataToDecrypt))
                 .andExpect(status().isBadRequest())
                 .andReturn();
@@ -382,6 +415,13 @@ public class RecordRestControllerTests {
         Assert.assertEquals(201, result.getResponse().getStatus());
         Assert.assertNotNull(userDTO.getUsername());
 
+        MvcResult authResult = mockMvc.perform(
+                post("http://localhost:8080/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(userDetails))
+                .andExpect(status().isOk())
+                .andReturn();
+
         String dataToEncrypt = "{\n" +
                 "\"value\" : \"testing 33\"\n" +
                 "}";
@@ -391,7 +431,7 @@ public class RecordRestControllerTests {
         MvcResult encryptionResult = mockMvc.perform(
                 post(encryptionUrl)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header(HttpHeaders.AUTHORIZATION, "Basic b251Y2hlOm9udWNoZQ==")
+                        .header(HttpHeaders.AUTHORIZATION, authResult.getResponse().getHeader("Authorization"))
                         .content(dataToEncrypt))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -414,7 +454,7 @@ public class RecordRestControllerTests {
         MvcResult encryptionUpdateResult = mockMvc.perform(
                 post(encryptionUpdateUrl)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header(HttpHeaders.AUTHORIZATION, "Basic b251Y2hlOm9udWNoZQ==")
+                        .header(HttpHeaders.AUTHORIZATION, authResult.getResponse().getHeader("Authorization"))
                         .content(dataToReEncrypt))
                 .andExpect(status().isBadRequest())
                 .andReturn();
@@ -434,7 +474,7 @@ public class RecordRestControllerTests {
         MvcResult encryptionResult = mockMvc.perform(
                 post("http://localhost:8080/api/data/encrypt")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header(HttpHeaders.AUTHORIZATION, "Basic d5y51Y2dfOm9dfWNoZQ==")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJvbnVjaGUiLCJhdXRob3JpdGllcyI6W10sImlhdCI6MTU2MTg0MTYyNywiZXhwIjoxNTYxOTI4MDI3fH.03aW242QImBAUw7rvMfhrtq0nNfvL3xBO1y8omk4wZrjyyczT0qY0d5k_V0oM6z7k5J3jN3V53uFCcrYAnWrtA")
                         .content(dataToEncrypt))
                 .andExpect(status().isUnauthorized())
                 .andReturn();
@@ -467,6 +507,13 @@ public class RecordRestControllerTests {
         Assert.assertEquals(201, result.getResponse().getStatus());
         Assert.assertNotNull(userDTO.getUsername());
 
+        MvcResult authResult = mockMvc.perform(
+                post("http://localhost:8080/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(userDetails))
+                .andExpect(status().isOk())
+                .andReturn();
+
         String dataToEncrypt = "{\n" +
                 "\"value\" : \"hey\"\n" +
                 "}";
@@ -474,7 +521,7 @@ public class RecordRestControllerTests {
         MvcResult encryptionResult = mockMvc.perform(
                 post("http://localhost:8080/api/data/22/encrypt_update")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header(HttpHeaders.AUTHORIZATION, "Basic b251Y2hlOm9udWNoZQ==")
+                        .header(HttpHeaders.AUTHORIZATION, authResult.getResponse().getHeader("Authorization"))
                         .content(dataToEncrypt))
                 .andExpect(status().isNotFound())
                 .andReturn();
@@ -507,6 +554,13 @@ public class RecordRestControllerTests {
         Assert.assertEquals(201, result.getResponse().getStatus());
         Assert.assertNotNull(userDTO.getUsername());
 
+        MvcResult authResult = mockMvc.perform(
+                post("http://localhost:8080/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(userDetails))
+                .andExpect(status().isOk())
+                .andReturn();
+
         String dataToDecrypt = "{\n" +
                 "\"value\" : \"wabSn2DbG3NeD4VyKlIo7q8ffBODe0P0WQioTCmQB2pJ3SDLoq4HymIDJ1wM4LvnFaGcajqrVUWsBlKgN5oSoA1PFyFv7imnxlTddpNrE2qzHJnrSC+geJOX7ufOiEblRpZ4keWzM/lqwP+lCWhfwBaACnEFQulLPjc4nhpA81CihJUToID9awevOdc1cTIjXNYsM+FdXOe7WdWJKxgLCX5i6qWX50FmSCStE4QX5ixfoqUG7FlXn85qNI4YAE/qgPE+2+7cEH4rG1AsnAVu05dXdkEzTvgndrkG9G18pVzd/2hut0QD2ZP3ZSWaZuQVUFjKAjex6o+iPdWdMPMp3A==\"\n" +
                 "}";
@@ -514,7 +568,7 @@ public class RecordRestControllerTests {
         MvcResult decryptionResult = mockMvc.perform(
                 post("http://localhost:8080/api/data/22/decrypt")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header(HttpHeaders.AUTHORIZATION, "Basic b251Y2hlOm9udWNoZQ==")
+                        .header(HttpHeaders.AUTHORIZATION, authResult.getResponse().getHeader("Authorization"))
                         .content(dataToDecrypt))
                 .andExpect(status().isNotFound())
                 .andReturn();
@@ -547,6 +601,13 @@ public class RecordRestControllerTests {
         Assert.assertEquals(201, result.getResponse().getStatus());
         Assert.assertNotNull(userDTO.getUsername());
 
+        MvcResult authResult = mockMvc.perform(
+                post("http://localhost:8080/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(userDetails))
+                .andExpect(status().isOk())
+                .andReturn();
+
         String dataToEncrypt = "{\n" +
                 "\"value\" : \"testing 33\"\n" +
                 "}";
@@ -556,7 +617,7 @@ public class RecordRestControllerTests {
         MvcResult encryptionResult = mockMvc.perform(
                 post(encryptionUrl)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header(HttpHeaders.AUTHORIZATION, "Basic b251Y2hlOm9udWNoZQ==")
+                        .header(HttpHeaders.AUTHORIZATION, authResult.getResponse().getHeader("Authorization"))
                         .content(dataToEncrypt))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -577,7 +638,7 @@ public class RecordRestControllerTests {
         MvcResult decryptionResult = mockMvc.perform(
                 post(recordDTO.getLink("decrypt").getHref())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header(HttpHeaders.AUTHORIZATION, "Basic b251Y2hlOm9udWNoZQ==")
+                        .header(HttpHeaders.AUTHORIZATION, authResult.getResponse().getHeader("Authorization"))
                         .content(dataToDecrypt))
                 .andExpect(status().isBadRequest())
                 .andReturn();
@@ -610,10 +671,17 @@ public class RecordRestControllerTests {
         Assert.assertEquals(201, result.getResponse().getStatus());
         Assert.assertNotNull(userDTO.getUsername());
 
+        MvcResult authResult = mockMvc.perform(
+                post("http://localhost:8080/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(userDetails))
+                .andExpect(status().isOk())
+                .andReturn();
+
         MvcResult allDataResult = mockMvc.perform(
                 get("http://localhost:8080/api/data/records")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header(HttpHeaders.AUTHORIZATION, "Basic b251Y2hlOm9udWNoZQ=="))
+                        .header(HttpHeaders.AUTHORIZATION, authResult.getResponse().getHeader("Authorization")))
                 .andExpect(status().isOk())
                 .andReturn();
 
