@@ -14,7 +14,6 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 import java.util.Objects;
-import java.util.Random;
 
 public class MyKeyGenerator {
 
@@ -94,7 +93,7 @@ public class MyKeyGenerator {
 
     }
 
-    public static SecretKey getSecretKey(String username, byte[] decryptedKey) {
+    public static SecretKey getSecretKey(byte[] decryptedKey) {
         return new SecretKeySpec(decryptedKey, 0, decryptedKey.length, "AES");
     }
 
@@ -139,3 +138,4 @@ public class MyKeyGenerator {
     }
 
 }
+c

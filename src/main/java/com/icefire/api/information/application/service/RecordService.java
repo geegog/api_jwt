@@ -63,8 +63,8 @@ public class RecordService {
             throw new UserNotFoundException(username, Throwables.getRootCause(new Throwable("User does not exist!")));
         }
 
-        SecretKey secretKey = MyKeyGenerator.keyGenerator();
-        byte[] iv = MyKeyGenerator.generatorIV();
+        SecretKey secretKey = key(username, user);
+        byte[] iv = MyKeyGenerator.getIV(username);
         AESCipher aesCipher = new AESCipher(secretKey, iv);
 
         String encryptedMessage = aesCipher.getEncryptedMessage(value);
@@ -94,8 +94,8 @@ public class RecordService {
             throw new UserNotFoundException(username, Throwables.getRootCause(new Throwable("User does not exist! User may have been deleted")));
         }
 
-        SecretKey secretKey = MyKeyGenerator.keyGenerator();
-        byte[] iv = MyKeyGenerator.generatorIV();
+        SecretKey secretKey = key(username, user);
+        byte[] iv = MyKeyGenerator.getIV(username);
         AESCipher aesCipher = new AESCipher(secretKey, iv);
 
         String encryptedMessage = aesCipher.getEncryptedMessage(value);
@@ -134,12 +134,19 @@ public class RecordService {
 
         User user = userService.getUser(username);
 
-        RSACipher rsaCipher = new RSACipher(MyKeyGenerator.getPrivateKey(username));
-
-        AESCipher aesCipher = new AESCipher(MyKeyGenerator.getSecretKey(username, rsaCipher.decryptedKey(user.getPublicKey())), MyKeyGenerator.getIV(username));
+        AESCipher aesCipher = cipher(username, user);
 
         record.setValue(aesCipher.getDecryptedMessage(value));
         return record;
     }
 
+    private AESCipher cipher(String username, User user) {
+        RSACipher rsaCipher = new RSACipher(MyKeyGenerator.getPrivateKey(username));
+        return new AESCipher(MyKeyGenerator.getSecretKey(rsaCipher.decryptedKey(user.getPublicKey())), MyKeyGenerator.getIV(username));
+    }
+
+    private SecretKey key(String username, User user) {
+        RSACipher rsaCipher = new RSACipher(MyKeyGenerator.getPrivateKey(username));
+        return MyKeyGenerator.getSecretKey(rsaCipher.decryptedKey(user.getPublicKey()));
+    }
 }

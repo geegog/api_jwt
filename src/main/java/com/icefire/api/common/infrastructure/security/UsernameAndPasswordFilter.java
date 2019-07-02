@@ -3,14 +3,11 @@ package com.icefire.api.common.infrastructure.security;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.icefire.api.common.application.dto.AuthResult;
 import com.icefire.api.user.domain.model.User;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import javax.servlet.FilterChain;
@@ -20,8 +17,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Collections;
-import java.util.Date;
-import java.util.stream.Collectors;
 
 public class UsernameAndPasswordFilter extends UsernamePasswordAuthenticationFilter {
 

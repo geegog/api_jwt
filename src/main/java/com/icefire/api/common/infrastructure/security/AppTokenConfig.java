@@ -15,6 +15,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.access.channel.ChannelProcessingFilter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import javax.servlet.http.HttpServletResponse;
@@ -38,6 +39,7 @@ public class AppTokenConfig extends WebSecurityConfigurerAdapter {
         http.cors()
                 .and()
                 .csrf().disable()
+                .addFilterBefore(new CorsFilter(), ChannelProcessingFilter.class)
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .exceptionHandling().authenticationEntryPoint((req, rsp, e) -> {
@@ -49,8 +51,6 @@ public class AppTokenConfig extends WebSecurityConfigurerAdapter {
                 .addFilterAfter(new TokenAuthFilter(jwtConfig), UsernamePasswordAuthenticationFilter.class)
                 // authorization requests config
                 .authorizeRequests()
-                //needed for CORS config in Javascript
-                .antMatchers(HttpMethod.OPTIONS).permitAll()
                 // allow all who are accessing authentication
                 .antMatchers(HttpMethod.POST, jwtConfig.getLogin()).permitAll()
                 .antMatchers(HttpMethod.GET, jwtConfig.getRefresh()).permitAll()
