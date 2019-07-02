@@ -83,11 +83,10 @@ public class RecordRestController {
         }
     }
 
-    @GetMapping(value = "/{userId}/records", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> allUserRecords(@PathVariable Long userId) {
-        String username = Objects.requireNonNull(authUser());
+    @GetMapping(value = "/{username}/records", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> allUserRecords(@PathVariable String username) {
         UserDTO userDTO = userService.getUserDTO(username);
-        return new ResponseEntity<>(recordService.allUserRecords(userId), HttpStatus.OK);
+        return new ResponseEntity<>(recordService.allUserRecords(username), HttpStatus.OK);
     }
 
     @GetMapping(value = "/records", produces = MediaType.APPLICATION_JSON_VALUE)

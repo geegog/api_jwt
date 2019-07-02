@@ -43,11 +43,11 @@ public class RecordService {
         return resources;
     }
 
-    public Resources<RecordDTO> allUserRecords(Long id) {
-        User user = userService.getUser(id);
+    public Resources<RecordDTO> allUserRecords(String username) {
+        User user = userService.getUser(username);
         final Resources<RecordDTO> resources = new Resources<>(recordAssembler.toResources(recordRepository.findAllByUser(user)));
         resources.add(linkTo(methodOn(RecordRestController.class)
-                .allUserRecords(user.getId())).withRel("records").withSelfRel().withType(HttpMethod.GET.toString()));
+                .allUserRecords(user.getUsername())).withRel("records").withSelfRel().withType(HttpMethod.GET.toString()));
         return resources;
     }
 

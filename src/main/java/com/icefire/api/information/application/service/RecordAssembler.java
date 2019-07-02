@@ -30,7 +30,7 @@ public class RecordAssembler extends ResourceAssemblerSupport<Record, RecordDTO>
         dto.setValue(record.getValue());
 
         dto.add(linkTo(methodOn(RecordRestController.class)
-                .allUserRecords(record.getUser().getId())).withRel("records").withType(HttpMethod.GET.toString()));
+                .allUserRecords(record.getUser().getUsername())).withRel("records").withType(HttpMethod.GET.toString()));
 
         dto.add(linkTo(methodOn(RecordRestController.class)
                 .getARecord(dto.get_id())).withSelfRel().withType(HttpMethod.GET.toString()));
