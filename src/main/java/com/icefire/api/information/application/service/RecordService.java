@@ -13,6 +13,8 @@ import com.icefire.api.information.domain.repository.RecordRepository;
 import com.icefire.api.information.rest.RecordRestController;
 import com.icefire.api.user.application.service.UserService;
 import com.icefire.api.user.domain.model.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Resources;
 import org.springframework.http.HttpMethod;
@@ -27,12 +29,11 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 @Service
 public class RecordService {
 
+    private static Logger logger = LoggerFactory.getLogger(RecordService.class);
     @Autowired
     RecordRepository recordRepository;
-
     @Autowired
     RecordAssembler recordAssembler;
-
     @Autowired
     UserService userService;
 

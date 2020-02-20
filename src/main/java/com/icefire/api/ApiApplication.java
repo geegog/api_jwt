@@ -22,6 +22,10 @@ import java.util.List;
 @EnableHypermediaSupport(type = EnableHypermediaSupport.HypermediaType.HAL)
 public class ApiApplication {
 
+    public static void main(String[] args) {
+        SpringApplication.run(ApiApplication.class, args);
+    }
+
     @Configuration
     static class ObjectMapperCustomizer {
         @Autowired
@@ -38,6 +42,7 @@ public class ApiApplication {
                     .configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
                     .registerModules(new JavaTimeModule());
         }
+
         @Bean
         public RestTemplate restTemplate() {
             RestTemplate _restTemplate = new RestTemplate();
@@ -46,10 +51,6 @@ public class ApiApplication {
             _restTemplate.setMessageConverters(messageConverters);
             return _restTemplate;
         }
-    }
-
-    public static void main(String[] args) {
-        SpringApplication.run(ApiApplication.class, args);
     }
 
 }

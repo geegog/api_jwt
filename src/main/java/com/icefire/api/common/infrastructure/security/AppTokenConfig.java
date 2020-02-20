@@ -25,13 +25,11 @@ import javax.servlet.http.HttpServletResponse;
 @EnableConfigurationProperties
 public class AppTokenConfig extends WebSecurityConfigurerAdapter {
 
-    @Autowired
-    private JwtConfig jwtConfig;
-
+    private static Logger logger = LoggerFactory.getLogger(AppTokenConfig.class);
     @Autowired
     UserDetailsService userDetailsService;
-
-    private static Logger logger = LoggerFactory.getLogger(AppTokenConfig.class);
+    @Autowired
+    private JwtConfig jwtConfig;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -43,8 +41,7 @@ public class AppTokenConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .exceptionHandling().authenticationEntryPoint((req, rsp, e) -> {
-            //e.printStackTrace();
-            logger.info("Error {}", e.getMessage());
+            logger.info("Error: {}, Response: {}", e.getMessage(), rsp);
             rsp.sendError(HttpServletResponse.SC_UNAUTHORIZED);
         }).and()
                 .addFilter(new UsernameAndPasswordFilter(jwtConfig, authenticationManager()))
@@ -67,7 +64,7 @@ public class AppTokenConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    public JwtConfig jwtConfig(){
+    public JwtConfig jwtConfig() {
         return new JwtConfig();
     }
 

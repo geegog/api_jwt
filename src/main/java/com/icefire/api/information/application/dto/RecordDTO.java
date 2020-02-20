@@ -1,7 +1,7 @@
 package com.icefire.api.information.application.dto;
 
 import com.icefire.api.common.rest.ResourceSupport;
-import lombok.*;
+import lombok.Data;
 
 import java.time.LocalDateTime;
 

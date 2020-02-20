@@ -5,14 +5,16 @@ import com.icefire.api.user.domain.model.User;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Lob;
+import javax.persistence.ManyToOne;
 
 @Data
-@EqualsAndHashCode(callSuper=true)
+@EqualsAndHashCode(callSuper = true)
 @Entity
 public class Record extends BaseEntity {
 
-    @Column(length = 512)
+    @Lob
     private String value;
 
     @ManyToOne

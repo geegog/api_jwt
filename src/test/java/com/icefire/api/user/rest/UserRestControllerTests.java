@@ -30,12 +30,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class UserRestControllerTests {
 
     @Autowired
-    private WebApplicationContext wac;
-    private MockMvc mockMvc;
-
-    @Autowired
     @Qualifier("_halObjectMapper")
     ObjectMapper mapper;
+    @Autowired
+    private WebApplicationContext wac;
+    private MockMvc mockMvc;
 
     @Before
     public void setup() {

@@ -11,38 +11,38 @@ import java.util.List;
 
 @XmlTransient
 public class ResourceSupport extends org.springframework.hateoas.ResourceSupport {
-	@XmlElement(name = "_xlink", namespace = Link.ATOM_NAMESPACE)
-	@JsonProperty("_xlinks")
-	private final List<ExtendedLink> _xlinks;
-	
-	public ResourceSupport(){
-		super();
-		this._xlinks = new ArrayList<>();
-	}
-	
-	public void add(Link link) {
-		if(link instanceof ExtendedLink)
-			this._xlinks.add((ExtendedLink) link);
-		else
-			super.add(link);
-	}
-	
-	public List<ExtendedLink> get_xlinks() {
-		return Collections.unmodifiableList(_xlinks);
-	}
+    @XmlElement(name = "_xlink", namespace = Link.ATOM_NAMESPACE)
+    @JsonProperty("_xlinks")
+    private final List<ExtendedLink> _xlinks;
 
-	public void remove_xlinks() {
-		_xlinks.clear();
-	}
+    public ResourceSupport() {
+        super();
+        this._xlinks = new ArrayList<>();
+    }
 
-	public ExtendedLink get_xlink(String rel) {
+    public void add(Link link) {
+        if (link instanceof ExtendedLink)
+            this._xlinks.add((ExtendedLink) link);
+        else
+            super.add(link);
+    }
 
-		for (ExtendedLink link : _xlinks) {
-			if (link.get_rel().equals(rel)) {
-				return link;
-			}
-		}
+    public List<ExtendedLink> get_xlinks() {
+        return Collections.unmodifiableList(_xlinks);
+    }
 
-		return null;
-	}
+    public void remove_xlinks() {
+        _xlinks.clear();
+    }
+
+    public ExtendedLink get_xlink(String rel) {
+
+        for (ExtendedLink link : _xlinks) {
+            if (link.get_rel().equals(rel)) {
+                return link;
+            }
+        }
+
+        return null;
+    }
 }

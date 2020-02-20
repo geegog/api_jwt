@@ -30,15 +30,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = ApiApplication.class)
 @WebAppConfiguration
-@DirtiesContext(classMode=DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class RecordRestControllerTests {
 
     @Autowired
+    @Qualifier("_halObjectMapper")
+    ObjectMapper mapper;
+    @Autowired
     private WebApplicationContext wac;
     private MockMvc mockMvc;
-
-    @Autowired @Qualifier("_halObjectMapper")
-    ObjectMapper mapper;
 
     @Before
     public void setup() {

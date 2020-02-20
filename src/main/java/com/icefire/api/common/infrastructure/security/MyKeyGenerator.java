@@ -1,5 +1,8 @@
 package com.icefire.api.common.infrastructure.security;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -19,13 +22,15 @@ public class MyKeyGenerator {
 
     private final static String PATH = "src/main/resources/keys/";
 
+    private static Logger logger = LoggerFactory.getLogger(MyKeyGenerator.class);
+
     public static SecretKey keyGenerator() {
         try {
             KeyGenerator kpg = KeyGenerator.getInstance("AES");
             kpg.init(256);
             return kpg.generateKey();
         } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
+            logger.error("Key Generation error: {}", e.getMessage());
         }
         return null;
     }
@@ -97,9 +102,9 @@ public class MyKeyGenerator {
         return new SecretKeySpec(decryptedKey, 0, decryptedKey.length, "AES");
     }
 
-    public static PublicKey getPublicKey(String base64PublicKey){
+    public static PublicKey getPublicKey(String base64PublicKey) {
         PublicKey publicKey;
-        try{
+        try {
             X509EncodedKeySpec keySpec = new X509EncodedKeySpec(Base64.getDecoder().decode(base64PublicKey.getBytes()));
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
             publicKey = keyFactory.generatePublic(keySpec);
@@ -115,8 +120,9 @@ public class MyKeyGenerator {
         try {
             Path path = Paths.get(PATH + username + "_private" + ".key");
             Files.write(path, privateKey.getEncoded());
+            logger.info("Private key save successfully for: {}", username);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Private key save error: {} {}", e.getMessage(), username);
         }
     }
 
@@ -125,8 +131,9 @@ public class MyKeyGenerator {
         try {
             Path path = Paths.get(PATH + username + "_iv" + ".txt");
             Files.write(path, vi);
+            logger.info("IV save successfully for: {}", username);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Private key save error: {} {}", e.getMessage(), username);
         }
     }
 

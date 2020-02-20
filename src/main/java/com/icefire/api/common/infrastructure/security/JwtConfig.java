@@ -18,99 +18,92 @@ import java.util.function.Function;
 @Data
 public class JwtConfig {
 
-	@Value("${security.jwt.login: /login}")
-	private String login;
+    static final String CLAIM_KEY_USERNAME = "sub";
+    static final String CLAIM_KEY_CREATED = "iat";
+    private static final long serialVersionUID = -3301605591108950415L;
+    @Value("${security.jwt.login: /login}")
+    private String login;
+    @Value("${security.jwt.refresh: /refresh}")
+    private String refresh;
+    @Value("${security.jwt.header:Authorization}")
+    private String header;
+    @Value("${security.jwt.expires:Expires}")
+    private String expires;
+    @Value("${security.jwt.prefix:Bearer }")
+    private String prefix;
+    @Value("${security.jwt.expiration:#{24*60*60}}")
+    private int expiration;
+    @Value("${security.jwt.secret:EDFFD6C61B4AB35B5CCBDF4F80BEF1D7F26B623C7E046E554E262AD1E3994D0E}")
+    private String secret;
+    private Clock clock = DefaultClock.INSTANCE;
 
-	@Value("${security.jwt.refresh: /refresh}")
-	private String refresh;
+    public String getUsernameFromToken(String token) {
+        return getClaimFromToken(token, Claims::getSubject);
+    }
 
-	@Value("${security.jwt.header:Authorization}")
-	private String header;
+    public Date getIssuedAtDateFromToken(String token) {
+        return getClaimFromToken(token, Claims::getIssuedAt);
+    }
 
-	@Value("${security.jwt.expires:Expires}")
-	private String expires;
+    public Date getExpirationDateFromToken(String token) {
+        return getClaimFromToken(token, Claims::getExpiration);
+    }
 
-	@Value("${security.jwt.prefix:Bearer }")
-	private String prefix;
+    public <T> T getClaimFromToken(String token, Function<Claims, T> claimsResolver) {
+        final Claims claims = getAllClaimsFromToken(token);
+        return claimsResolver.apply(claims);
+    }
 
-	@Value("${security.jwt.expiration:#{24*60*60}}")
-	private int expiration;
+    private Claims getAllClaimsFromToken(String token) {
+        return Jwts.parser().setSigningKey(secret.getBytes()).parseClaimsJws(token).getBody();
+    }
 
-	@Value("${security.jwt.secret:JwtSecretKey}")
-	private String secret;
+    private Boolean isTokenExpired(String token) {
+        final Date expiration = getExpirationDateFromToken(token);
+        return expiration.before(clock.now());
+    }
 
-	static final String CLAIM_KEY_USERNAME = "sub";
-	static final String CLAIM_KEY_CREATED = "iat";
-	private static final long serialVersionUID = -3301605591108950415L;
-	private Clock clock = DefaultClock.INSTANCE;
+    private Boolean ignoreTokenExpiration(String token) {
+        // here you specify tokens, for that the expiration is ignored
+        return false;
+    }
 
-	public String getUsernameFromToken(String token) {
-		return getClaimFromToken(token, Claims::getSubject);
-	}
+    public String generateToken(String username) {
+        Map<String, Object> claims = new HashMap<>();
+        return doGenerateToken(claims, username);
+    }
 
-	public Date getIssuedAtDateFromToken(String token) {
-		return getClaimFromToken(token, Claims::getIssuedAt);
-	}
+    private String doGenerateToken(Map<String, Object> claims, String subject) {
+        final Date createdDate = clock.now();
+        final Date expirationDate = calculateExpirationDate(createdDate);
 
-	public Date getExpirationDateFromToken(String token) {
-		return getClaimFromToken(token, Claims::getExpiration);
-	}
+        return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(createdDate)
+                .setExpiration(expirationDate).signWith(SignatureAlgorithm.HS512, secret.getBytes()).compact();
+    }
 
-	public <T> T getClaimFromToken(String token, Function<Claims, T> claimsResolver) {
-		final Claims claims = getAllClaimsFromToken(token);
-		return claimsResolver.apply(claims);
-	}
+    public Boolean canTokenBeRefreshed(String token) {
+        return (!isTokenExpired(token) || ignoreTokenExpiration(token));
+    }
 
-	private Claims getAllClaimsFromToken(String token) {
-		return Jwts.parser().setSigningKey(secret.getBytes()).parseClaimsJws(token).getBody();
-	}
+    public String refreshToken(String token) {
+        final Date createdDate = clock.now();
+        final Date expirationDate = calculateExpirationDate(createdDate);
 
-	private Boolean isTokenExpired(String token) {
-		final Date expiration = getExpirationDateFromToken(token);
-		return expiration.before(clock.now());
-	}
+        final Claims claims = getAllClaimsFromToken(token);
+        claims.setIssuedAt(createdDate);
+        claims.setExpiration(expirationDate);
 
-	private Boolean ignoreTokenExpiration(String token) {
-		// here you specify tokens, for that the expiration is ignored
-		return false;
-	}
+        return Jwts.builder().setClaims(claims).signWith(SignatureAlgorithm.HS512, secret.getBytes()).compact();
+    }
 
-	public String generateToken(String username) {
-		Map<String, Object> claims = new HashMap<>();
-		return doGenerateToken(claims, username);
-	}
+    public Boolean validateToken(String token, UserDetails userDetails) {
+        User user = (User) userDetails;
+        final String username = getUsernameFromToken(token);
+        return (username.equals(user.getUsername()) && !isTokenExpired(token));
+    }
 
-	private String doGenerateToken(Map<String, Object> claims, String subject) {
-		final Date createdDate = clock.now();
-		final Date expirationDate = calculateExpirationDate(createdDate);
-
-		return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(createdDate)
-				.setExpiration(expirationDate).signWith(SignatureAlgorithm.HS512, secret.getBytes()).compact();
-	}
-
-	public Boolean canTokenBeRefreshed(String token) {
-		return (!isTokenExpired(token) || ignoreTokenExpiration(token));
-	}
-
-	public String refreshToken(String token) {
-		final Date createdDate = clock.now();
-		final Date expirationDate = calculateExpirationDate(createdDate);
-
-		final Claims claims = getAllClaimsFromToken(token);
-		claims.setIssuedAt(createdDate);
-		claims.setExpiration(expirationDate);
-
-		return Jwts.builder().setClaims(claims).signWith(SignatureAlgorithm.HS512, secret.getBytes()).compact();
-	}
-
-	public Boolean validateToken(String token, UserDetails userDetails) {
-		User user = (User) userDetails;
-		final String username = getUsernameFromToken(token);
-		return (username.equals(user.getUsername()) && !isTokenExpired(token));
-	}
-
-	private Date calculateExpirationDate(Date createdDate) {
-		return new Date(createdDate.getTime() + expiration * 1000);
-	}
+    private Date calculateExpirationDate(Date createdDate) {
+        return new Date(createdDate.getTime() + expiration * 1000);
+    }
 
 }

@@ -1,10 +1,13 @@
 package com.icefire.api.common.infrastructure.security;
 
 import com.google.common.io.BaseEncoding;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -12,6 +15,7 @@ import java.security.NoSuchAlgorithmException;
 public class AESCipher {
 
     private static final String ALGORITHM_AES256 = "AES/CBC/PKCS5Padding";
+    private static Logger logger = LoggerFactory.getLogger(AESCipher.class);
     private final SecretKey secretKey;
     private IvParameterSpec iv;
 
@@ -20,7 +24,7 @@ public class AESCipher {
      *
      * @param secretKey SecretKey
      */
-    public AESCipher(SecretKey  secretKey, byte[] iv) {
+    public AESCipher(SecretKey secretKey, byte[] iv) {
         this.secretKey = secretKey;
         this.iv = new IvParameterSpec(iv);
     }
@@ -36,7 +40,7 @@ public class AESCipher {
             Cipher cipher = Cipher.getInstance(ALGORITHM_AES256);
             cipher.init(Cipher.ENCRYPT_MODE, secretKey, iv);
 
-            byte[] encryptedTextBytes = cipher.doFinal(message.getBytes("UTF-8"));
+            byte[] encryptedTextBytes = cipher.doFinal(message.getBytes(StandardCharsets.UTF_8.name()));
 
             return BaseEncoding.base64().encode(encryptedTextBytes);
         } catch (IllegalBlockSizeException | BadPaddingException | UnsupportedEncodingException | NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | InvalidAlgorithmParameterException e) {

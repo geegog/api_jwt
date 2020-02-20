@@ -24,16 +24,15 @@ import java.util.Objects;
 @RequestMapping("/api/data")
 public class RecordRestController {
 
+    private static Logger logger = LoggerFactory.getLogger(RecordRestController.class);
     @Autowired
     private RecordService recordService;
-
     @Autowired
     private UserService userService;
 
-    private static Logger logger = LoggerFactory.getLogger(RecordRestController.class);
-
     @PostMapping("/encrypt")
     public ResponseEntity<?> encrypt(@RequestBody DataDTO dataDTO) {
+        logger.info("Data {}", dataDTO);
         if (StringUtils.isEmpty(dataDTO.getValue())) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST, "Value cannot be empty");
@@ -43,6 +42,7 @@ public class RecordRestController {
         try {
             return new ResponseEntity<>(recordService.encrypt(dataDTO.getValue(), username), HttpStatus.OK);
         } catch (UserNotFoundException e) {
+            logger.error("User not found {}, {}", userDTO, e);
             throw new ResponseStatusException(
                     HttpStatus.NOT_FOUND, e.getMessage(), e);
         }
@@ -50,6 +50,7 @@ public class RecordRestController {
 
     @PostMapping("/{id}/encrypt_update")
     public ResponseEntity<?> encrypt(@RequestBody DataDTO dataDTO, @PathVariable Long id) {
+        logger.info("Data to update {} {}", dataDTO, id);
         if (StringUtils.isEmpty(dataDTO.getValue())) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST, "Value cannot be empty");
@@ -59,6 +60,7 @@ public class RecordRestController {
         try {
             return new ResponseEntity<>(recordService.encrypt(dataDTO.getValue(), username, id), HttpStatus.OK);
         } catch (RecordNotFoundException | UserNotFoundException e) {
+            logger.error("User {}, error {}", userDTO, e);
             throw new ResponseStatusException(
                     HttpStatus.NOT_FOUND, e.getMessage(), e);
         }
@@ -66,6 +68,7 @@ public class RecordRestController {
 
     @PostMapping("/{id}/decrypt")
     public ResponseEntity<?> decrypt(@RequestBody DataDTO dataDTO, @PathVariable Long id) {
+        logger.info("Data to decrypt {} {}", dataDTO, id);
         if (StringUtils.isEmpty(dataDTO.getValue())) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST, "Value cannot be empty");
@@ -75,9 +78,11 @@ public class RecordRestController {
         try {
             return new ResponseEntity<>(recordService.decrypt(dataDTO.getValue(), id, username), HttpStatus.OK);
         } catch (RecordNotFoundException e) {
+            logger.error("Record not found {}, {}", userDTO, e);
             throw new ResponseStatusException(
                     HttpStatus.NOT_FOUND, e.getMessage(), e);
         } catch (BadValueException e) {
+            logger.error("Bad value {}, {}", userDTO, e);
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST, e.getMessage(), e);
         }
@@ -102,7 +107,6 @@ public class RecordRestController {
         UserDTO userDTO = userService.getUserDTO(username);
         return new ResponseEntity<>(recordService.getRecord(id), HttpStatus.OK);
     }
-
 
 
     private String authUser() {

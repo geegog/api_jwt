@@ -18,18 +18,16 @@ import javax.servlet.http.HttpServletRequest;
 @RestController
 public class AuthenticationController {
 
+    private static Logger logger = LoggerFactory.getLogger(AuthenticationController.class);
     @Autowired
     private JwtConfig jwtConfig;
-
     @Autowired
     private MyUserDetailsService myUserDetailsService;
-
-    private static Logger logger = LoggerFactory.getLogger(AuthenticationController.class);
 
     @RequestMapping(value = "/refresh", method = RequestMethod.GET)
     public ResponseEntity<?> refreshAndGetAuthenticationToken(HttpServletRequest request) {
         String authToken = request.getHeader(jwtConfig.getHeader());
-        final String token = authToken.replace(jwtConfig.getPrefix(),"");
+        final String token = authToken.replace(jwtConfig.getPrefix(), "");
         String username = jwtConfig.getUsernameFromToken(token);
         User user = (User) myUserDetailsService.loadUserByUsername(username);
 

@@ -1,17 +1,18 @@
 package com.icefire.api.common.infrastructure.security;
 
 import com.google.common.io.BaseEncoding;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.crypto.*;
-import javax.crypto.spec.SecretKeySpec;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
-import java.security.PublicKey;
 
 public class RSACipher {
 
     private static final String ALGORITHM_RSA = "RSA/ECB/PKCS1Padding";
+    private static Logger logger = LoggerFactory.getLogger(RSACipher.class);
     private Key key;
 
     /**

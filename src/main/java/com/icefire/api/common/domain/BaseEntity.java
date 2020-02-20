@@ -1,6 +1,6 @@
 package com.icefire.api.common.domain;
 
-import lombok.*;
+import lombok.Data;
 
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;

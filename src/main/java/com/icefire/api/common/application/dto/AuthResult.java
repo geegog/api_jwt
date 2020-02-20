@@ -5,6 +5,6 @@ import lombok.Data;
 @Data
 public class AuthResult {
 
-	private boolean error;
-	private String message;
+    private boolean error;
+    private String message;
 }
