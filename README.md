@@ -1,4 +1,5 @@
 # api_jwt
+A demonstration of data encryption and decryption using Advanced Encryption Standard (AES) and RSA Algorithm in Java. A demonstration of JWT Authorization is also shown.
 
 # How to run the application
 
